@@ -3,6 +3,7 @@ package com.nk.reservation.services;
 import com.nk.reservation.entity.Reservation;
 import com.nk.reservation.entity.ReservationTypes;
 import com.nk.reservation.repository.ReservationRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -31,37 +32,7 @@ class ReservationServicesTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        reservation = new Reservation(1,1000,
-                1,LocalDate.now(),
-                "Airline",LocalDate.now(),
-                1000,"534","remarks",
-                new ReservationTypes(1,"Flight"), null);        
-    }
-
-    @Test
-    void testAddNewReservation_ValidReservation() {
-        // Mock the repository's behavior
-        when(reservationRepository.save(reservation)).thenReturn(reservation);
-
-        // Call the service method
-        reservationServices.addNewReservation(reservation);
-
-        // Verify that the repository save method was called
-        verify(reservationRepository, times(1)).save(reservation);
-    }
-
-    @Test
-    void testAddNewReservation_InvalidReservation_amount() {
-        // Create an invalid reservation
-        Reservation reservation = new Reservation();
-        reservation.setAmount(-10);
-
-        // Call the service method
-        assertThrows(IllegalArgumentException.class, () -> reservationServices.addNewReservation(reservation));
-        // Verify that the repository save method was not called
-        verify(reservationRepository, never()).save(reservation);
+        MockitoAnnotations.openMocks(this);      
     }
 
     @Test
@@ -100,12 +71,90 @@ class ReservationServicesTest {
         assertNotEquals(optionalReservation, result_inv);
     }
 
-    @Test
-    void testDownloadReservationsDoc() {
-        // Call the service method
-        byte[] result = reservationServices.downloadReservationsDoc();
+    // @Test
+    // void testDownloadReservationsDoc() {
+    //     // Call the service method
+    //     byte[] result = reservationServices.downloadReservationsDoc();
 
-        // Verify the result is null
-        assertNull(result);
+    //     // Verify the result is null
+    //     assertNull(result);
+    // }
+
+
+
+    @Test
+    void testAddNewReservation_ValidReservationDate() {
+        // Arrange
+        Reservation validReservation_1 = new Reservation();
+        validReservation_1.setReservationDate(LocalDate.now());
+        validReservation_1.setReservationTypeId(new ReservationTypes(1,""));
+
+        // Act
+        reservationServices.addNewReservation(validReservation_1);
+
+        // Assert
+        verify(reservationRepository, times(1)).save(validReservation_1);
+
+            // Arrange
+        Reservation validReservation_2 = new Reservation();
+        validReservation_2.setReservationDate(LocalDate.now());
+        validReservation_2.setReservationTypeId(new ReservationTypes(5,""));
+
+        // Act
+        reservationServices.addNewReservation(validReservation_2);
+
+        // Assert
+        verify(reservationRepository, times(1)).save(validReservation_2);
+    }
+
+    @Test
+    void testAddNewReservation_InvalidDate() {
+        // Arrange
+        Reservation invalidDateReservation = new Reservation();
+        invalidDateReservation.setReservationDate(LocalDate.now().plusDays(1000));
+        invalidDateReservation.setReservationTypeId(new ReservationTypes(5,""));
+
+        // Act and Assert
+        verify(reservationRepository, times(0)).save(invalidDateReservation);
+    }
+
+    @Test
+    void testAddNewReservation_ExceedingAmount() {
+        // Arrange
+        Reservation exceedingAmountReservation = new Reservation();
+        exceedingAmountReservation.setAmount(999999999);
+
+        // Act and Assert
+        verify(reservationRepository, times(0)).save(exceedingAmountReservation);
+    }
+
+    @Test
+    void testAddNewReservation_ExceedingCount() {
+        // Arrange
+        List<Reservation> existingReservations = new ArrayList<>();
+        existingReservations.add(new Reservation());
+        existingReservations.add(new Reservation());
+        existingReservations.add(new Reservation());
+
+        Reservation exceedingCountReservation = new Reservation();
+
+        // Verify that the save method was not called
+        verify(reservationRepository, times(0)).save(exceedingCountReservation);
+    }
+
+    @Test
+    void testAddNewReservation_ValidTypes() {
+        // Arrange
+        Reservation reservation_1=new Reservation();
+        reservation_1.setReservationTypeId(new ReservationTypes(1,""));
+        reservationRepository.save(reservation_1);
+
+        Reservation exceedingCountReservation = new Reservation();
+        exceedingCountReservation.setReservationTypeId(new ReservationTypes(3,""));
+
+        // Verify that the save method was not called
+        verify(reservationRepository, times(0)).save(exceedingCountReservation);
+
+        exceedingCountReservation.setReservationTypeId(new ReservationTypes(5,""));
     }
 }

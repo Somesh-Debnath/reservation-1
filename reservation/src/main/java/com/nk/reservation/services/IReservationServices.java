@@ -1,5 +1,6 @@
 package com.nk.reservation.services;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +11,7 @@ public interface IReservationServices {
     public List<Reservation> getAllReservations();
     public void addNewReservation(Reservation reservation);
     public List<Reservation> getReservationsByTravelRequestId(int travelRequestId);
-    public byte[] downloadReservationsDoc();
+    public ByteArrayInputStream downloadReservationsDoc(int id);
     public Optional<Reservation> getReservationById(int id);
 
 }

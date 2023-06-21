@@ -29,11 +29,9 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int travelRequestId;
-
     private int reservationDoneByEmployeeId;
-    private LocalDate createdOn;
+    private LocalDate createdOn=LocalDate.now();;
     private String reservationDoneWithEntity;
     private LocalDate reservationDate;
     private int amount;
@@ -67,7 +65,7 @@ public class Reservation {
     //     },
     //     "reservationDocs": []
     // }
-
+        
 
 
     
